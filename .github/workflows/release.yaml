@@ -1,0 +1,36 @@
+---
+name: Release
+
+"on":
+  push:
+    branches:
+      - main
+
+jobs:
+  release:
+    name: Release to NPM
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup Go environment
+        uses: actions/setup-go@v3
+        with:
+          cache: true
+          go-version-file: go.mod
+
+      - name: Download go dependencies
+        run: go mod download
+
+      - name: Build
+        run: make build
+
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18
+      - run: |
+          npm version --no-git-tag-version $(go list -m -f '{{.Version}}' github.com/open-policy-agent/opa)-$(git rev-parse --short HEAD)
+          npm publish --access=public
+        env:
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
