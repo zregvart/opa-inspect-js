@@ -1,6 +1,7 @@
 .PHONY: build
 build:
-	@GOPHERJS_GOROOT="$$(go env GOROOT)" go run github.com/gopherjs/gopherjs build --tags safe .
+	@GOOS=js GOARCH=wasm go build -o inspect.wasm
+	@cp -f "$$(go env GOROOT)/misc/wasm/wasm_exec.js" .
 
 demo: build
 	@node example.js | jq .

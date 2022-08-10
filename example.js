@@ -1,6 +1,9 @@
-require('./opa-inspect-js.js')
+const opa = require("./index");
 
-json = Inspect('example.rego', `package hmm
+opa(function (inspect) {
+  const json = inspect(
+    "example.rego",
+    `package hmm
 
 # METADATA
 # title: Task bundle was not used or is not defined
@@ -12,9 +15,8 @@ json = Inspect('example.rego', `package hmm
 #   failure_msg: Task '%s' does not contain a bundle reference
 #
 deny[msg] {
-	msg := "nope"
-}`)
-
-console.log(json)
-
-process.exit()
+msg := "nope"
+}`
+  );
+  console.log(json);
+});
