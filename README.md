@@ -6,8 +6,16 @@ from `wasm_exec.js` -- included in the Golang runtime and copied to the package.
 
 ## Example
 
+Add the dependency:
+
+```sh
+npm add @zregvart/opa-inspect
+```
+
+Run this example with `node example.js`
+
 ```javascript
-const opaInspect = require("opa-inspect-js");
+const opaInspect = require("opa-inspect");
 
 opaInspect(function (inspect) {
   const json = inspect(

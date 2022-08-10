@@ -2,7 +2,7 @@
   "name": "@zregvart/opa-inspect",
   "version": "0.43.0-75b0ea9",
   "description": "opa inspect functionality in JavaScript",
-  "main": "opa-inspect-js.js",
+  "main": "index.js",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/zregvart/opa-inspect-js.git"
