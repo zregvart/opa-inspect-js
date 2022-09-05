@@ -19,19 +19,21 @@ func main() {
 		module := args[1].String()
 		mod, err := ast.ParseModuleWithOpts(path, module, ast.ParserOptions{ProcessAnnotation: true})
 		if err != nil {
-			return err.Error()
+			return "ERR: " + err.Error()
 		}
 
 		as, x := ast.BuildAnnotationSet([]*ast.Module{mod})
 		if len(x) > 0 {
-			return err.Error()
+			return "ERR: " + err.Error()
 		}
 
 		var buffy bytes.Buffer
 		for _, rule := range mod.Rules {
 			flattened := as.Chain(rule)
 			for _, entry := range flattened {
-				json.NewEncoder(&buffy).Encode(entry)
+				if err := json.NewEncoder(&buffy).Encode(entry); err != nil {
+					return "ERR: " + err.Error()
+				}
 			}
 		}
 

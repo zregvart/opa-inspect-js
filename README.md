@@ -15,10 +15,9 @@ npm add @zregvart/opa-inspect
 Run this example with `node example.js`
 
 ```javascript
-const opaInspect = require("opa-inspect");
+const opa = require("@zregvart/opa-inspect");
 
-opaInspect(function (inspect) {
-  const json = inspect(
+opa.inspect(
     "example.rego",
     `package hmm
 
@@ -33,8 +32,7 @@ opaInspect(function (inspect) {
 #
 deny[msg] {
 msg := "nope"
-}`
-  );
+}`).then(json => {
   console.log(json);
 });
 ```

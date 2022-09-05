@@ -1,35 +1,52 @@
-"use strict";
+'use strict';
 
-const fs = require("fs");
-const path = require("path");
-const crypto = require("crypto");
+const fs = require('fs');
+const path = require('path');
+const crypto = require('crypto');
 
-Object.defineProperty(global, "crypto", {
+Object.defineProperty(global, 'crypto', {
   value: {
     getRandomValues: (arr) => crypto.randomBytes(arr.length),
   },
 });
 
-require("./wasm_exec");
+require('./wasm_exec');
 
-module.exports = (cb) => {
-  (async function () {
-    const go = new Go();
-    go.exit = process.exit;
-    process.on("exit", (code) => {
-      if (code === 0 && !go.exited) {
-        go._pendingEvent = { id: 0 };
-        go._resume();
-      }
+const terminate = code => {
+  if (go.exited) {
+    return;
+  }
+
+  opa.finish();
+  if (code === 0 && !go.exited) {
+    go._pendingEvent = { id: 0 };
+    go._resume();
+  }
+}
+
+const go = new Go();
+process.on('exit', terminate);
+
+module.exports = {
+  inspect: (filename, rego) => {
+    return new Promise((resolve, reject) => {
+      WebAssembly.instantiate(
+        fs.readFileSync(path.resolve(__dirname, 'inspect.wasm')),
+        go.importObject
+      )
+      .then(result => {
+        go.run(result.instance);
+      })
+      .then(() => {
+        const val = opa.inspect(filename, rego);
+        if (val.startsWith("ERR:")) {
+          reject(val);
+        } else {
+          resolve(JSON.parse(val));
+        }
+      })
+      .catch(reject)
+      .finally(terminate);
     });
-
-    let result = await WebAssembly.instantiate(
-      fs.readFileSync(path.resolve(__dirname, "inspect.wasm")),
-      go.importObject
-    );
-    go.run(result.instance);
-  })().then(() => {
-    cb(opa.inspect);
-    opa.finish();
-  });
-};
+  }
+}

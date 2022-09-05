@@ -26,6 +26,9 @@ jobs:
       - name: Build
         run: make build
 
+      - name: Test
+        run: make test
+
       - uses: actions/setup-node@v3
         with:
           node-version: 18

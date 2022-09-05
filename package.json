@@ -17,10 +17,17 @@
     "url": "https://github.com/zregvart/opa-inspect-js/issues"
   },
   "homepage": "https://github.com/zregvart/opa-inspect-js#readme",
+  "scripts": {
+    "test": "jest"
+  },
   "files": [
     "*.js",
     "*.js.map",
     "inspect.wasm",
-    "!example.js"
-  ]
+    "!example.js",
+    "!*.test.js"
+  ],
+  "devDependencies": {
+    "jest": "^29.0.2"
+  }
 }
