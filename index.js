@@ -12,6 +12,10 @@ Object.defineProperty(global, 'crypto', {
 
 require('./wasm_exec');
 
+const jsonLinesToJson = jsonLines => {
+  return "[" + jsonLines.trim().split("\n").join(",") + "]"
+}
+
 const terminate = code => {
   if (go.exited) {
     return;
@@ -42,7 +46,7 @@ module.exports = {
         if (val.startsWith("ERR:")) {
           reject(val);
         } else {
-          resolve(JSON.parse(val));
+          resolve(JSON.parse(jsonLinesToJson(val)));
         }
       })
       .catch(reject)
