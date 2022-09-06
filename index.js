@@ -12,6 +12,10 @@ Object.defineProperty(global, 'crypto', {
 
 require('./wasm_exec');
 
+const uniqueLines = lines => {
+  return Array.from(new Set(lines.trim().split("\n"))).join("\n")
+}
+
 const jsonLinesToJson = jsonLines => {
   return "[" + jsonLines.trim().split("\n").join(",") + "]"
 }
@@ -46,7 +50,7 @@ module.exports = {
         if (val.startsWith("ERR:")) {
           reject(val);
         } else {
-          resolve(JSON.parse(jsonLinesToJson(val)));
+          resolve(JSON.parse(jsonLinesToJson(uniqueLines(val))));
         }
       })
       .catch(reject)
