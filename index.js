@@ -36,7 +36,7 @@ const go = new Go();
 process.on('exit', terminate);
 
 module.exports = {
-  inspect: (filename, rego) => {
+  inspect: (filename, rego, annotations_only=false) => {
     return new Promise((resolve, reject) => {
       WebAssembly.instantiate(
         fs.readFileSync(path.resolve(__dirname, 'inspect.wasm')),
@@ -50,7 +50,9 @@ module.exports = {
         if (val.startsWith("ERR:")) {
           reject(val);
         } else {
-          resolve(JSON.parse(jsonLinesToJson(uniqueLines(val))));
+          const ruleData = JSON.parse(jsonLinesToJson(uniqueLines(val)))
+          // Optionally remove records for rules with no annotations
+          resolve(annotations_only ? ruleData.filter(a => a.annotations) : ruleData);
         }
       })
       .catch(reject)
