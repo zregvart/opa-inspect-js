@@ -1,8 +1,14 @@
 build: .env index.js inspect.wasm wasm_exec.js
 
-.PHONY: test
-test: build node_modules
+.PHONY: test-go
+test-go:
+	@PATH="$$PATH:$$(go env GOROOT)/misc/wasm" GOOS=js GOARCH=wasm go test ./... -timeout 500ms
+
+.PHONY: test-js
+test-js: build node_modules
 	@npm test
+
+test: test-go test-js
 
 node_modules:
 	@npm ci
