@@ -3,3 +3,4 @@ wasm_exec.js
 *.tgz
 node_modules
 .env
+yarn-error.log
