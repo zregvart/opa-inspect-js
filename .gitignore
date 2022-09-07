@@ -2,3 +2,4 @@ inspect.wasm
 wasm_exec.js
 *.tgz
 node_modules
+.env
