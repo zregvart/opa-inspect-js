@@ -1,5 +1,4 @@
-.PHONY: build package.json
-build: inspect.wasm wasm_exec.js
+build: .env inspect.wasm wasm_exec.js
 
 .PHONY: test
 test: build node_modules
@@ -21,3 +20,6 @@ inspect.wasm:
 
 wasm_exec.js:
 	@cp -f "$$(go env GOROOT)/misc/wasm/wasm_exec.js" .
+
+.env: .env.template
+	@while read line; do eval "echo $${line}"; done < .env.template > .env
