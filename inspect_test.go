@@ -91,3 +91,25 @@ func TestInspectSingleFileLoadedViaCustomReadFunction(t *testing.T) {
 
 	cupaloy.SnapshotT(t, json)
 }
+
+func TestInspectSingleFileGivenAsArray(t *testing.T) {
+	ary := js.Global().Get("Array").New("__test__/example.rego")
+	args := []js.Value{
+		ary,
+	}
+
+	json := inspect(that, args)
+
+	cupaloy.SnapshotT(t, json)
+}
+
+func TestInspectMultipleFilesGivenAsArray(t *testing.T) {
+	ary := js.Global().Get("Array").New("__test__/example.rego", "__test__/example2.rego")
+	args := []js.Value{
+		ary,
+	}
+
+	json := inspect(that, args)
+
+	cupaloy.SnapshotT(t, json)
+}

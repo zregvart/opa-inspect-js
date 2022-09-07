@@ -54,28 +54,49 @@ func inspect(this js.Value, args []js.Value) any {
 	if len(args) < 1 {
 		return "ERR: path argument is required, given no arguments"
 	}
-	path := args[0].String()
 
-	read := determineReadFunc(this)
-
-	var module string
-	if len(args) == 2 && args[1].Type() == js.TypeString {
-		module = args[1].String()
-	} else {
-		if bytes, err := read(path); err == nil {
-			module = string(bytes)
-		} else {
-			return "ERR: " + err.Error()
+	var paths []string
+	if args[0].Type() == js.TypeString {
+		paths = []string{args[0].String()}
+	} else if len := args[0].Length(); len > 0 {
+		for i := 0; i < len; i++ {
+			paths = append(paths, args[0].Index(i).String())
 		}
 	}
 
-	result, err := inspectSingle(path, module)
-	if err != nil {
-		return "ERR: " + err.Error()
+	read := determineReadFunc(this)
+
+	var modules []string
+	if len(args) == 2 && args[1].Type() == js.TypeString {
+		if len(paths) > 1 {
+			return "ERR: provided more than one filename and a single Rego module"
+		}
+		modules = []string{args[1].String()}
+	} else {
+		for _, path := range paths {
+			if bytes, err := read(path); err == nil {
+				modules = append(modules, string(bytes))
+			} else {
+				return "ERR: " + err.Error()
+			}
+		}
+	}
+
+	var results []*ast.AnnotationsRef
+
+	for i := 0; i < len(paths); i++ {
+		path := paths[i]
+		module := modules[i]
+		result, err := inspectSingle(path, module)
+		if err != nil {
+			return "ERR: " + err.Error()
+		}
+
+		results = append(results, result...)
 	}
 
 	var buffy bytes.Buffer
-	if err := json.NewEncoder(&buffy).Encode(result); err != nil {
+	if err := json.NewEncoder(&buffy).Encode(results); err != nil {
 		return "ERR: " + err.Error()
 	}
 

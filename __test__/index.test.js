@@ -28,3 +28,19 @@ test('inspects rego files read from the filesystem', async () => {
         }
     ]);
 });
+
+test('inspects multiple rego files', async () => {
+    const json = await opa.inspect([path.join(__dirname, 'example.rego'), path.join(__dirname, 'example2.rego')]);
+    expect(json).toMatchSnapshot([
+        {
+            "location": {
+                "file": expect.stringMatching(/.*__test__\/example\.rego/),
+            }
+        },
+        {
+            "location": {
+                "file": expect.stringMatching(/.*__test__\/example2\.rego/),
+            }
+        }
+    ]);
+});
