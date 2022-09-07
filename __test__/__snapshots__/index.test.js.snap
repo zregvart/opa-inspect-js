@@ -51,7 +51,7 @@ fail the contract if the task is not called from a bundle.",
     },
     "location": {
       "col": 1,
-      "file": "/home/zregvart/tmp/opa-inspect-js/__test__/example.rego",
+      "file": StringMatching /\\.\\*__test__\\\\/example\\\\\\.rego/,
       "row": 12,
     },
     "path": [

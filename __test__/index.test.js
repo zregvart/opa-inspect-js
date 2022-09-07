@@ -20,5 +20,11 @@ test('reports error when parsing', async () => {
 
 test('inspects rego files read from the filesystem', async () => {
     const json = await opa.inspect(path.join(__dirname, 'example.rego'));
-    expect(json).toMatchSnapshot();
+    expect(json).toMatchSnapshot([
+        {
+            "location": {
+                "file": expect.stringMatching(/.*__test__\/example\.rego/),
+            }
+        }
+    ]);
 });
