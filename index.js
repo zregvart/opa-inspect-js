@@ -38,6 +38,8 @@ module.exports = {
         go.run(result.instance);
       })
       .then(() => {
+        opa.read = (path) => fs.readFileSync(path)
+
         const val = opa.inspect(filename, rego);
         if (val.startsWith("ERR:")) {
           reject(val);

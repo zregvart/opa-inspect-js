@@ -7,11 +7,9 @@ import (
 	"github.com/bradleyjkemp/cupaloy"
 )
 
-func TestInspectProvidedFile(t *testing.T) {
-	that := js.Null()
-	args := []js.Value{
-		js.ValueOf("example.rego"),
-		js.ValueOf(`package hmm
+var that = js.ValueOf(map[string]any{})
+
+var rego = `package hmm
 
 # METADATA
 # title: Task bundle was not used or is not defined
@@ -25,7 +23,12 @@ func TestInspectProvidedFile(t *testing.T) {
 deny[msg] {
 	msg := "nope"
 }
-`),
+`
+
+func TestInspectProvidedFile(t *testing.T) {
+	args := []js.Value{
+		js.ValueOf("example.rego"),
+		js.ValueOf(rego),
 	}
 
 	json := inspect(that, args)
@@ -34,7 +37,6 @@ deny[msg] {
 }
 
 func TestInspectSingleFileLoaded(t *testing.T) {
-	that := js.Null()
 	args := []js.Value{
 		js.ValueOf("__test__/example.rego"),
 	}
@@ -45,7 +47,6 @@ func TestInspectSingleFileLoaded(t *testing.T) {
 }
 
 func TestInspectSingleFileLoadedSecondArgumentNull(t *testing.T) {
-	that := js.Null()
 	args := []js.Value{
 		js.ValueOf("__test__/example.rego"),
 		js.Null(),
@@ -57,13 +58,36 @@ func TestInspectSingleFileLoadedSecondArgumentNull(t *testing.T) {
 }
 
 func TestInspectSingleFileLoadedSecondArgumentUndefined(t *testing.T) {
-	that := js.Null()
 	args := []js.Value{
 		js.ValueOf("__test__/example.rego"),
 		js.Undefined(),
 	}
 
 	json := inspect(that, args)
+
+	cupaloy.SnapshotT(t, json)
+}
+
+func TestInspectSingleFileLoadedViaCustomReadFunction(t *testing.T) {
+	read := js.FuncOf(func(this js.Value, args []js.Value) any {
+		bytes := []byte(rego)
+		ary := js.Global().Get("Uint8Array").New(len(bytes))
+
+		js.CopyBytesToJS(ary, bytes)
+
+		return ary
+	})
+
+	that := js.ValueOf(map[string]any{
+		"read": read,
+	})
+	args := []js.Value{
+		js.ValueOf("__test__/example.rego"),
+	}
+
+	json := inspect(that, args)
+
+	print(json)
 
 	cupaloy.SnapshotT(t, json)
 }

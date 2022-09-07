@@ -11,17 +11,36 @@ import (
 
 var done = make(chan (bool))
 
+type readFn func(path string) ([]byte, error)
+
 func inspect(this js.Value, args []js.Value) any {
 	if len(args) < 1 {
 		return "ERR: path argument is required, given no arguments"
 	}
 	path := args[0].String()
 
+	var read readFn
+	r := this.Get("read")
+	if r.Type() == js.TypeFunction {
+		read = func(path string) ([]byte, error) {
+			val := r.Invoke(path)
+			bytes := make([]byte, val.Length())
+
+			if js.CopyBytesToGo(bytes, val) == 0 {
+				panic("no bytes copied")
+			}
+
+			return bytes, nil
+		}
+	} else {
+		read = os.ReadFile
+	}
+
 	var module string
 	if len(args) == 2 && !args[1].IsNull() && !args[1].IsUndefined() {
 		module = args[1].String()
 	} else {
-		if bytes, err := os.ReadFile(path); err == nil {
+		if bytes, err := read(path); err == nil {
 			module = string(bytes)
 		} else {
 			return "ERR: " + err.Error()
