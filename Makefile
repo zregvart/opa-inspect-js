@@ -1,4 +1,4 @@
-build: .env inspect.wasm wasm_exec.js
+build: .env index.js inspect.wasm wasm_exec.js
 
 .PHONY: test
 test: build node_modules
@@ -15,11 +15,14 @@ clean:
 demo: build
 	@node example.js |jq .
 
-inspect.wasm:
+inspect.wasm: inspect.go
 	@GOOS=js GOARCH=wasm go build -o inspect.wasm
 
-wasm_exec.js:
+wasm_exec.js: $(shell go env GOROOT)/misc/wasm/wasm_exec.js
 	@cp -f "$$(go env GOROOT)/misc/wasm/wasm_exec.js" .
+
+index.js: package.json node_modules
+	@touch index.js
 
 .env: .env.template
 	@while read line; do eval "echo $${line}"; done < .env.template > .env
