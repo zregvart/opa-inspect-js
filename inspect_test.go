@@ -9,7 +9,7 @@ import (
 
 var that = js.ValueOf(map[string]any{})
 
-var rego = `package hmm
+var rego = `package example
 
 # METADATA
 # title: Task bundle was not used or is not defined

@@ -25,7 +25,7 @@ fail the contract if the task is not called from a bundle.",
       },
       {
         "type": "string",
-        "value": "hmm",
+        "value": "example",
       },
       {
         "type": "string",
@@ -61,7 +61,7 @@ fail the contract if the task is not called from a bundle.",
       },
       {
         "type": "string",
-        "value": "hmm",
+        "value": "example",
       },
       {
         "type": "string",
@@ -97,7 +97,7 @@ fail the contract if the task is not called from a bundle.",
       },
       {
         "type": "string",
-        "value": "hmm",
+        "value": "example",
       },
       {
         "type": "string",

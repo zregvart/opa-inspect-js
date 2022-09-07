@@ -1,4 +1,4 @@
-package hmm
+package example
 
 # METADATA
 # title: Task bundle was not used or is not defined
