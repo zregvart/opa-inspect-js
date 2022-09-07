@@ -13,16 +13,29 @@ var done = make(chan (bool))
 
 type readFn func(path string) ([]byte, error)
 
-func inspect(this js.Value, args []js.Value) any {
-	if len(args) < 1 {
-		return "ERR: path argument is required, given no arguments"
+func inspectSingle(path, module string) ([]*ast.AnnotationsRef, error) {
+	mod, err := ast.ParseModuleWithOpts(path, module, ast.ParserOptions{ProcessAnnotation: true})
+	if err != nil {
+		return nil, err
 	}
-	path := args[0].String()
 
-	var read readFn
+	as, x := ast.BuildAnnotationSet([]*ast.Module{mod})
+	if len(x) > 0 {
+		return nil, err
+	}
+
+	result := make([]*ast.AnnotationsRef, 0, len(mod.Rules))
+	for _, rule := range mod.Rules {
+		result = append(result, as.Chain(rule)...)
+	}
+
+	return result, nil
+}
+
+func determineReadFunc(this js.Value) readFn {
 	r := this.Get("read")
 	if r.Type() == js.TypeFunction {
-		read = func(path string) ([]byte, error) {
+		return func(path string) ([]byte, error) {
 			val := r.Invoke(path)
 			bytes := make([]byte, val.Length())
 
@@ -32,12 +45,21 @@ func inspect(this js.Value, args []js.Value) any {
 
 			return bytes, nil
 		}
-	} else {
-		read = os.ReadFile
 	}
 
+	return os.ReadFile
+}
+
+func inspect(this js.Value, args []js.Value) any {
+	if len(args) < 1 {
+		return "ERR: path argument is required, given no arguments"
+	}
+	path := args[0].String()
+
+	read := determineReadFunc(this)
+
 	var module string
-	if len(args) == 2 && !args[1].IsNull() && !args[1].IsUndefined() {
+	if len(args) == 2 && args[1].Type() == js.TypeString {
 		module = args[1].String()
 	} else {
 		if bytes, err := read(path); err == nil {
@@ -47,19 +69,9 @@ func inspect(this js.Value, args []js.Value) any {
 		}
 	}
 
-	mod, err := ast.ParseModuleWithOpts(path, module, ast.ParserOptions{ProcessAnnotation: true})
+	result, err := inspectSingle(path, module)
 	if err != nil {
 		return "ERR: " + err.Error()
-	}
-
-	as, x := ast.BuildAnnotationSet([]*ast.Module{mod})
-	if len(x) > 0 {
-		return "ERR: " + err.Error()
-	}
-
-	result := make([]*ast.AnnotationsRef, 0, len(mod.Rules))
-	for _, rule := range mod.Rules {
-		result = append(result, as.Chain(rule)...)
 	}
 
 	var buffy bytes.Buffer
