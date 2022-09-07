@@ -3,6 +3,7 @@ package main
 import (
 	"bytes"
 	"encoding/json"
+	"os"
 	"syscall/js"
 
 	"github.com/open-policy-agent/opa/ast"
@@ -11,8 +12,22 @@ import (
 var done = make(chan (bool))
 
 func inspect(this js.Value, args []js.Value) any {
+	if len(args) < 1 {
+		return "ERR: path argument is required, given no arguments"
+	}
 	path := args[0].String()
-	module := args[1].String()
+
+	var module string
+	if len(args) == 2 && !args[1].IsNull() && !args[1].IsUndefined() {
+		module = args[1].String()
+	} else {
+		if bytes, err := os.ReadFile(path); err == nil {
+			module = string(bytes)
+		} else {
+			return "ERR: " + err.Error()
+		}
+	}
+
 	mod, err := ast.ParseModuleWithOpts(path, module, ast.ParserOptions{ProcessAnnotation: true})
 	if err != nil {
 		return "ERR: " + err.Error()

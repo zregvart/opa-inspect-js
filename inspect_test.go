@@ -7,7 +7,7 @@ import (
 	"github.com/bradleyjkemp/cupaloy"
 )
 
-func TestInspectSingleFile(t *testing.T) {
+func TestInspectProvidedFile(t *testing.T) {
 	that := js.Null()
 	args := []js.Value{
 		js.ValueOf("example.rego"),
@@ -26,6 +26,41 @@ deny[msg] {
 	msg := "nope"
 }
 `),
+	}
+
+	json := inspect(that, args)
+
+	cupaloy.SnapshotT(t, json)
+}
+
+func TestInspectSingleFileLoaded(t *testing.T) {
+	that := js.Null()
+	args := []js.Value{
+		js.ValueOf("__test__/example.rego"),
+	}
+
+	json := inspect(that, args)
+
+	cupaloy.SnapshotT(t, json)
+}
+
+func TestInspectSingleFileLoadedSecondArgumentNull(t *testing.T) {
+	that := js.Null()
+	args := []js.Value{
+		js.ValueOf("__test__/example.rego"),
+		js.Null(),
+	}
+
+	json := inspect(that, args)
+
+	cupaloy.SnapshotT(t, json)
+}
+
+func TestInspectSingleFileLoadedSecondArgumentUndefined(t *testing.T) {
+	that := js.Null()
+	args := []js.Value{
+		js.ValueOf("__test__/example.rego"),
+		js.Undefined(),
 	}
 
 	json := inspect(that, args)

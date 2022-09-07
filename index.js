@@ -28,7 +28,7 @@ const go = new Go();
 process.on('exit', terminate);
 
 module.exports = {
-  inspect: (filename, rego) => {
+  inspect: (filename, rego = null) => {
     return new Promise((resolve, reject) => {
       WebAssembly.instantiate(
         fs.readFileSync(path.resolve(__dirname, 'inspect.wasm')),
