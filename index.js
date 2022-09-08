@@ -12,23 +12,21 @@ Object.defineProperty(global, 'crypto', {
 
 require('./wasm_exec');
 
-const terminate = code => {
-  if (go.exited) {
-    return;
-  }
-
-  opa.finish();
-  if (code === 0 && !go.exited) {
-    go._pendingEvent = { id: 0 };
-    go._resume();
-  }
-}
-
-const go = new Go();
-process.on('exit', terminate);
-
 module.exports = {
-  inspect: (filename, rego = null) => {
+  inspect: (filepath, module = null) => {
+    // main.that will assign functions to this insance
+    const that = {}
+
+    const go = new Go();
+    // pass the reference so it's accessible in main.that
+    go.that = that
+    process.on('exit', code => {
+      if (code === 0 && !go.exited) {
+        go._pendingEvent = { id: 0 };
+        go._resume();
+      }
+    });
+
     return new Promise((resolve, reject) => {
       WebAssembly.instantiate(
         fs.readFileSync(path.resolve(__dirname, 'inspect.wasm')),
@@ -38,9 +36,9 @@ module.exports = {
         go.run(result.instance);
       })
       .then(() => {
-        opa.read = (path) => fs.readFileSync(path)
+        that.read = (path) => fs.readFileSync(path)
 
-        const val = opa.inspect(filename, rego);
+        const val = that.inspect(filepath, module);
         if (val.startsWith("ERR:")) {
           reject(val);
         } else {
@@ -48,7 +46,7 @@ module.exports = {
         }
       })
       .catch(reject)
-      .finally(terminate);
+      .finally(() => that.finish());
     });
   }
 }

@@ -1,0 +1,17 @@
+--- wasm_exec.js	2022-09-07 12:26:05.750288654 +0200
++++ wasm_exec.js	2022-09-08 16:05:08.948576448 +0200
+@@ -451,6 +451,14 @@
+ 					"debug": (value) => {
+ 						console.log(value);
+ 					},
++
++					"main.that": (sp) => {
++						sp >>>= 0;
++						const that = loadValue(sp + 8);
++						for (let k in that) {
++							this.that[k] = that[k];
++						}
++					}
+ 				}
+ 			};
+ 		}

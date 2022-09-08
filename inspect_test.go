@@ -7,7 +7,7 @@ import (
 	"github.com/bradleyjkemp/cupaloy"
 )
 
-var that = js.ValueOf(map[string]any{})
+var stubThat = js.ValueOf(map[string]any{})
 
 var rego = `package example
 
@@ -31,7 +31,7 @@ func TestInspectProvidedFile(t *testing.T) {
 		js.ValueOf(rego),
 	}
 
-	json := inspect(that, args)
+	json := inspect(stubThat, args)
 
 	cupaloy.SnapshotT(t, json)
 }
@@ -41,7 +41,7 @@ func TestInspectSingleFileLoaded(t *testing.T) {
 		js.ValueOf("__test__/example.rego"),
 	}
 
-	json := inspect(that, args)
+	json := inspect(stubThat, args)
 
 	cupaloy.SnapshotT(t, json)
 }
@@ -52,7 +52,7 @@ func TestInspectSingleFileLoadedSecondArgumentNull(t *testing.T) {
 		js.Null(),
 	}
 
-	json := inspect(that, args)
+	json := inspect(stubThat, args)
 
 	cupaloy.SnapshotT(t, json)
 }
@@ -63,7 +63,7 @@ func TestInspectSingleFileLoadedSecondArgumentUndefined(t *testing.T) {
 		js.Undefined(),
 	}
 
-	json := inspect(that, args)
+	json := inspect(stubThat, args)
 
 	cupaloy.SnapshotT(t, json)
 }
@@ -98,7 +98,7 @@ func TestInspectSingleFileGivenAsArray(t *testing.T) {
 		ary,
 	}
 
-	json := inspect(that, args)
+	json := inspect(stubThat, args)
 
 	cupaloy.SnapshotT(t, json)
 }
@@ -109,7 +109,7 @@ func TestInspectMultipleFilesGivenAsArray(t *testing.T) {
 		ary,
 	}
 
-	json := inspect(that, args)
+	json := inspect(stubThat, args)
 
 	cupaloy.SnapshotT(t, json)
 }

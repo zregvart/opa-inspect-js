@@ -24,8 +24,9 @@ demo: build
 inspect.wasm: inspect.go
 	@GOOS=js GOARCH=wasm go build -o inspect.wasm
 
-wasm_exec.js: $(shell go env GOROOT)/misc/wasm/wasm_exec.js
+wasm_exec.js: $(shell go env GOROOT)/misc/wasm/wasm_exec.js wasm_exec.js.patch
 	@cp -f "$$(go env GOROOT)/misc/wasm/wasm_exec.js" .
+	@patch < wasm_exec.js.patch
 
 index.js: package.json node_modules
 	@touch index.js

@@ -1,3 +1,6 @@
+//go:build js && wasm
+// +build js,wasm
+
 package main
 
 import (
@@ -5,6 +8,7 @@ import (
 	"encoding/json"
 	"os"
 	"syscall/js"
+	"unsafe"
 
 	"github.com/open-policy-agent/opa/ast"
 )
@@ -12,6 +16,8 @@ import (
 var done = make(chan (bool))
 
 type readFn func(path string) ([]byte, error)
+
+func that(uint64)
 
 func inspectSingle(path, module string) ([]*ast.AnnotationsRef, error) {
 	mod, err := ast.ParseModuleWithOpts(path, module, ast.ParserOptions{ProcessAnnotation: true})
@@ -104,15 +110,20 @@ func inspect(this js.Value, args []js.Value) any {
 }
 
 func main() {
-	js.Global().Set("opa", make(map[string]interface{}))
+	o := js.Global().Get("Object").New()
 
-	opa := js.Global().Get("opa")
 	f := js.FuncOf(inspect)
-	opa.Set("inspect", f)
+	o.Set("inspect", f)
 
-	opa.Set("finish", js.FuncOf(func(this js.Value, args []js.Value) any {
+	o.Set("finish", js.FuncOf(func(this js.Value, args []js.Value) any {
 		done <- true
 		return nil
 	}))
+
+	p := unsafe.Pointer(&o)
+	// fetching Value.ref which is at the top of the Value struct
+	v := unsafe.Pointer(uintptr(p))
+	that(*(*uint64)(v))
+
 	<-done
 }
