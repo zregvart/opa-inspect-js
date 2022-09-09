@@ -44,3 +44,22 @@ test('inspects multiple rego files', async () => {
         }
     ]);
 });
+
+test('inspects vinyl streams', async () => {
+    const vfs = require('vinyl-fs');
+
+    const json = await opa.inspect(vfs.src(path.join(__dirname, '*.rego')));
+
+    expect(json).toMatchSnapshot([
+        {
+            "location": {
+                "file": expect.stringMatching(/.*__test__\/example\.rego/),
+            }
+        },
+        {
+            "location": {
+                "file": expect.stringMatching(/.*__test__\/example2\.rego/),
+            }
+        }
+    ]);
+});

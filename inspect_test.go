@@ -119,3 +119,33 @@ func TestInspectMultipleFilesGivenAsArray(t *testing.T) {
 
 	cupaloy.SnapshotT(t, json)
 }
+
+func TestInspectVinylStream(t *testing.T) {
+	stream := js.ValueOf(map[string]any{
+		"pipe": js.FuncOf(func(this js.Value, args []js.Value) any {
+			handler := args[0]
+
+			handler.Call("write", js.ValueOf(map[string]any{
+				"path": "example.rego",
+				"contents": js.ValueOf(map[string]any{
+					"toString": js.FuncOf(func(this js.Value, args []js.Value) any {
+						return rego
+					}),
+				}),
+			}))
+
+			handler.Call("end")
+
+			return nil
+		}),
+	})
+
+	args := []js.Value{
+		stream,
+	}
+
+	json, err := outcome(inspect(stubThat, args))
+	assert.NoError(t, err)
+
+	cupaloy.SnapshotT(t, json)
+}

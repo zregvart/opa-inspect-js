@@ -158,6 +158,45 @@ func inspect(this js.Value, args []js.Value) any {
 			}()
 
 			return resolveWith(ch)
+		} else if pipe := args[0].Get("pipe"); pipe.Type() == js.TypeFunction {
+			nop := js.FuncOf(func(this js.Value, args []js.Value) any {
+				return nil
+			})
+
+			ch := make(chan result)
+
+			go func() {
+				paths := make([]string, 0)
+				modules := make([]string, 0)
+
+				stream := js.ValueOf(map[string]any{
+					"on":   nop,
+					"once": nop,
+					"emit": nop,
+					"write": js.FuncOf(func(this js.Value, args []js.Value) any {
+						paths = append(paths, args[0].Get("path").String())
+						buff := args[0].Get("contents")
+						module := buff.Call("toString").String()
+						modules = append(modules, module)
+
+						return nil
+					}),
+					"end": js.FuncOf(func(this js.Value, args []js.Value) any {
+						if results, err := inspectMultiple(paths, modules); err != nil {
+							ch <- result{err: err}
+						} else if json, err := serialize(results); err != nil {
+							ch <- result{err: err}
+						} else {
+							ch <- result{value: json}
+						}
+
+						return nil
+					}),
+				})
+				args[0].Call("pipe", stream)
+			}()
+
+			return resolveWith(ch)
 		} else {
 			return rejectWith(fmt.Errorf("unsupported argument: %s", js.Global().Get("Object").Call("getPrototypeOf", args[0])))
 		}
