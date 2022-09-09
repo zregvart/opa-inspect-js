@@ -71,7 +71,7 @@ func inspectSingle(path, module string) ([]*ast.AnnotationsRef, error) {
 func inspectMultiple(paths, modules []string) ([]*ast.AnnotationsRef, error) {
 	noPaths := len(paths)
 	if noPaths != len(modules) {
-		return nil, fmt.Errorf("given uneaven number of paths and modules: %d != %d", noPaths, len(modules))
+		return nil, fmt.Errorf("given uneven number of paths and modules: %d != %d", noPaths, len(modules))
 	}
 
 	results := make([]*ast.AnnotationsRef, 0, noPaths)

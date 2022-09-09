@@ -1,8 +1,10 @@
 # `opa inspect` for JavaScript
 
-This compiles the functionality of `opa inspect` wrapped in JavaScript by
-`inspect.go` to WebAssembly, which is included in `index.js` with the Go runtime
-from `wasm_exec.js` -- included in the Golang runtime and copied to the package.
+This compiles the functionality of
+[`opa inspect`](https://www.openpolicyagent.org/docs/latest/cli/#opa-inspect)
+wrapped in JavaScript by `inspect.go` to WebAssembly, which is included in
+`index.js` with the Go runtime from `wasm_exec.js` -- included in the Golang
+runtime and copied to the package.
 
 ## Example
 
@@ -31,7 +33,7 @@ opa.inspect(
 #   failure_msg: Task '%s' does not contain a bundle reference
 #
 deny[msg] {
-msg := "nope"
+    msg := "nope"
 }`).then(json => {
   console.log(json);
 });
