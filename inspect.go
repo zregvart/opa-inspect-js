@@ -60,12 +60,40 @@ func inspectSingle(path, module string) ([]*ast.AnnotationsRef, error) {
 		return nil, err
 	}
 
-	result := make([]*ast.AnnotationsRef, 0, len(mod.Rules))
+	results := make([]*ast.AnnotationsRef, 0, len(mod.Rules))
 	for _, rule := range mod.Rules {
-		result = append(result, as.Chain(rule)...)
+		results = append(results, as.Chain(rule)...)
 	}
 
-	return result, nil
+	return results, nil
+}
+
+func inspectMultiple(paths, modules []string) ([]*ast.AnnotationsRef, error) {
+	noPaths := len(paths)
+	if noPaths != len(modules) {
+		return nil, fmt.Errorf("given uneaven number of paths and modules: %d != %d", noPaths, len(modules))
+	}
+
+	results := make([]*ast.AnnotationsRef, 0, noPaths)
+	for i := 0; i < noPaths; i++ {
+		r, err := inspectSingle(paths[i], modules[i])
+		if err != nil {
+			return nil, err
+		}
+
+		results = append(results, r...)
+	}
+
+	return results, nil
+}
+
+func serialize(results []*ast.AnnotationsRef) (string, error) {
+	var buffy bytes.Buffer
+	if err := json.NewEncoder(&buffy).Encode(results); err != nil {
+		return "", err
+	}
+
+	return buffy.String(), nil
 }
 
 func inspect(this js.Value, args []js.Value) any {
@@ -89,12 +117,11 @@ func inspect(this js.Value, args []js.Value) any {
 					ch <- result{err: err}
 				}
 
-				var buffy bytes.Buffer
-				if err := json.NewEncoder(&buffy).Encode(results); err != nil {
+				if json, err := serialize(results); err != nil {
 					ch <- result{err: err}
+				} else {
+					ch <- result{value: json}
 				}
-
-				ch <- result{value: buffy.String()}
 			}()
 
 			return resolveWith(ch)
@@ -105,10 +132,12 @@ func inspect(this js.Value, args []js.Value) any {
 			ch := make(chan result)
 
 			go func() {
-				results := make([]*ast.AnnotationsRef, 0, len)
+				paths := make([]string, 0, len)
+				modules := make([]string, 0, len)
 
 				for i := 0; i < len; i++ {
 					path := pathAry.Index(i).String()
+					paths = append(paths, path)
 
 					moduleBytes, err := os.ReadFile(path)
 					if err != nil {
@@ -116,21 +145,16 @@ func inspect(this js.Value, args []js.Value) any {
 					}
 
 					module := string(moduleBytes)
-
-					r, err := inspectSingle(path, module)
-					if err != nil {
-						ch <- result{err: err}
-					}
-
-					results = append(results, r...)
+					modules = append(modules, module)
 				}
 
-				var buffy bytes.Buffer
-				if err := json.NewEncoder(&buffy).Encode(results); err != nil {
+				if results, err := inspectMultiple(paths, modules); err != nil {
 					ch <- result{err: err}
+				} else if json, err := serialize(results); err != nil {
+					ch <- result{err: err}
+				} else {
+					ch <- result{value: json}
 				}
-
-				ch <- result{value: buffy.String()}
 			}()
 
 			return resolveWith(ch)
@@ -156,12 +180,11 @@ func inspect(this js.Value, args []js.Value) any {
 				ch <- result{err: err}
 			}
 
-			var buffy bytes.Buffer
-			if err := json.NewEncoder(&buffy).Encode(results); err != nil {
+			if json, err := serialize(results); err != nil {
 				ch <- result{err: err}
+			} else {
+				ch <- result{value: json}
 			}
-
-			ch <- result{value: buffy.String()}
 		}()
 
 		return resolveWith(ch)
