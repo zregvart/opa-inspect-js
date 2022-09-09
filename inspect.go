@@ -194,15 +194,13 @@ func inspect(this js.Value, args []js.Value) any {
 }
 
 func main() {
-	o := js.Global().Get("Object").New()
-
-	f := js.FuncOf(inspect)
-	o.Set("inspect", f)
-
-	o.Set("finish", js.FuncOf(func(this js.Value, args []js.Value) any {
-		wait.Done()
-		return nil
-	}))
+	o := js.ValueOf(map[string]any{
+		"inspect": js.FuncOf(inspect),
+		"finish": js.FuncOf(func(this js.Value, args []js.Value) any {
+			wait.Done()
+			return nil
+		}),
+	})
 
 	p := unsafe.Pointer(&o)
 	// fetching Value.ref which is at the top of the Value struct
