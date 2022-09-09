@@ -37,6 +37,16 @@ msg := "nope"
 });
 ```
 
+## API
+
+**`opa.inspect`**
+
+Can be called with following combination of arguments:
+  * `<string>` - a path that can be read using the `fs` module
+  * `<string>`, `<string>` - a path/filename and the content of the Rego module inline, performs in-memory
+  * `<Array<string>>` - an array of paths that can be read using the `fs` module
+  * `<stream<File>>` - a [Vinyl](https://github.com/gulpjs/vinyl) stream of files
+
 ## Building
 
 Run `make build` to build, this copies `wasm_exec.js` from the Golang runtime
