@@ -7,6 +7,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"os"
 	"sync"
 	"syscall/js"
@@ -137,6 +138,8 @@ func inspect(this js.Value, args []js.Value) any {
 			}()
 
 			return resolveWith(ch)
+		} else {
+			return rejectWith(fmt.Errorf("unsupported argument: %s", js.Global().Get("Object").Call("getPrototypeOf", args[0])))
 		}
 	}
 
