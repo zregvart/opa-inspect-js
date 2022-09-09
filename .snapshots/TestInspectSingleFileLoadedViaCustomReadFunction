@@ -1,2 +1,0 @@
-[{"location":{"file":"__test__/example.rego","row":12,"col":1},"path":[{"type":"var","value":"data"},{"type":"string","value":"example"},{"type":"string","value":"deny"}],"annotations":{"scope":"rule","title":"Task bundle was not used or is not defined","description":"Check for existence of a task bundle. Enforcing this rule will\nfail the contract if the task is not called from a bundle.","custom":{"failure_msg":"Task '%s' does not contain a bundle reference","short_name":"disallowed_task_reference"}}}]
-

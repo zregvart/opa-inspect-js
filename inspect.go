@@ -6,18 +6,47 @@ package main
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"os"
+	"sync"
 	"syscall/js"
 	"unsafe"
 
 	"github.com/open-policy-agent/opa/ast"
 )
 
-var done = make(chan (bool))
-
-type readFn func(path string) ([]byte, error)
+var wait sync.WaitGroup
 
 func that(uint64)
+
+type result struct {
+	value string
+	err   error
+}
+
+func rejectWith(err error) js.Value {
+	return js.Global().Get("Promise").Call("reject", err.Error())
+}
+
+func resolveWith(r chan result) js.Value {
+	wait.Add(1)
+	return js.Global().Get("Promise").New(js.FuncOf(func(this js.Value, args []js.Value) any {
+		resolve := args[0]
+		reject := args[1]
+
+		go func() {
+			defer wait.Done()
+			res := <-r
+			if res.err != nil {
+				reject.Invoke(res.err.Error())
+			} else {
+				resolve.Invoke(res.value)
+			}
+		}()
+
+		return nil
+	}))
+}
 
 func inspectSingle(path, module string) ([]*ast.AnnotationsRef, error) {
 	mod, err := ast.ParseModuleWithOpts(path, module, ast.ParserOptions{ProcessAnnotation: true})
@@ -38,75 +67,108 @@ func inspectSingle(path, module string) ([]*ast.AnnotationsRef, error) {
 	return result, nil
 }
 
-func determineReadFunc(this js.Value) readFn {
-	r := this.Get("read")
-	if r.Type() == js.TypeFunction {
-		return func(path string) ([]byte, error) {
-			val := r.Invoke(path)
-			bytes := make([]byte, val.Length())
-
-			if js.CopyBytesToGo(bytes, val) == 0 {
-				panic("no bytes copied")
-			}
-
-			return bytes, nil
-		}
-	}
-
-	return os.ReadFile
+func tmp() ([]byte, error) {
+	return make([]byte, 0, 10), nil
 }
 
 func inspect(this js.Value, args []js.Value) any {
-	if len(args) < 1 {
-		return "ERR: path argument is required, given no arguments"
-	}
+	if len(args) == 1 {
+		if args[0].Type() == js.TypeString {
+			// given a single path
+			path := args[0].String()
 
-	var paths []string
-	if args[0].Type() == js.TypeString {
-		paths = []string{args[0].String()}
-	} else if len := args[0].Length(); len > 0 {
-		for i := 0; i < len; i++ {
-			paths = append(paths, args[0].Index(i).String())
+			ch := make(chan result)
+
+			go func() {
+				moduleBytes, err := os.ReadFile(path)
+				if err != nil {
+					ch <- result{err: err}
+				}
+
+				module := string(moduleBytes)
+
+				results, err := inspectSingle(path, module)
+				if err != nil {
+					ch <- result{err: err}
+				}
+
+				var buffy bytes.Buffer
+				if err := json.NewEncoder(&buffy).Encode(results); err != nil {
+					ch <- result{err: err}
+				}
+
+				ch <- result{value: buffy.String()}
+			}()
+
+			return resolveWith(ch)
+		} else if args[0].InstanceOf(js.Global().Get("Array")) {
+			pathAry := args[0]
+			len := pathAry.Length()
+
+			ch := make(chan result)
+
+			go func() {
+				results := make([]*ast.AnnotationsRef, 0, len)
+
+				for i := 0; i < len; i++ {
+					path := pathAry.Index(i).String()
+
+					moduleBytes, err := os.ReadFile(path)
+					if err != nil {
+						ch <- result{err: err}
+					}
+
+					module := string(moduleBytes)
+
+					r, err := inspectSingle(path, module)
+					if err != nil {
+						ch <- result{err: err}
+					}
+
+					results = append(results, r...)
+				}
+
+				var buffy bytes.Buffer
+				if err := json.NewEncoder(&buffy).Encode(results); err != nil {
+					ch <- result{err: err}
+				}
+
+				ch <- result{value: buffy.String()}
+			}()
+
+			return resolveWith(ch)
 		}
 	}
 
-	read := determineReadFunc(this)
-
-	var modules []string
-	if len(args) == 2 && args[1].Type() == js.TypeString {
-		if len(paths) > 1 {
-			return "ERR: provided more than one filename and a single Rego module"
+	if len(args) == 2 {
+		if args[0].Type() != js.TypeString || args[1].Type() != js.TypeString {
+			return rejectWith(errors.New("when given two arguments expecting both to be of string type"))
 		}
-		modules = []string{args[1].String()}
-	} else {
-		for _, path := range paths {
-			if bytes, err := read(path); err == nil {
-				modules = append(modules, string(bytes))
-			} else {
-				return "ERR: " + err.Error()
+
+		// given a path and module (Rego source) as string
+		path := args[0].String()
+		module := args[1].String()
+
+		ch := make(chan result)
+
+		go func() {
+			results, err := inspectSingle(path, module)
+			if err != nil {
+				ch <- result{err: err}
 			}
-		}
+
+			var buffy bytes.Buffer
+			if err := json.NewEncoder(&buffy).Encode(results); err != nil {
+				ch <- result{err: err}
+			}
+
+			ch <- result{value: buffy.String()}
+		}()
+
+		return resolveWith(ch)
 	}
 
-	var results []*ast.AnnotationsRef
-
-	for i := 0; i < len(paths); i++ {
-		path := paths[i]
-		module := modules[i]
-		result, err := inspectSingle(path, module)
-		if err != nil {
-			return "ERR: " + err.Error()
-		}
-
-		results = append(results, result...)
-	}
-
-	var buffy bytes.Buffer
-	if err := json.NewEncoder(&buffy).Encode(results); err != nil {
-		return "ERR: " + err.Error()
-	}
-
-	return string(buffy.Bytes())
+	return rejectWith(errors.New("at least one argument is required, given no arguments"))
 }
 
 func main() {
@@ -116,7 +178,7 @@ func main() {
 	o.Set("inspect", f)
 
 	o.Set("finish", js.FuncOf(func(this js.Value, args []js.Value) any {
-		done <- true
+		wait.Done()
 		return nil
 	}))
 
@@ -125,5 +187,7 @@ func main() {
 	v := unsafe.Pointer(uintptr(p))
 	that(*(*uint64)(v))
 
-	<-done
+	wait.Add(1)
+
+	wait.Wait()
 }

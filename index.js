@@ -10,10 +10,12 @@ Object.defineProperty(global, 'crypto', {
   },
 });
 
+globalThis.fs = fs
+
 require('./wasm_exec');
 
 module.exports = {
-  inspect: (filepath, module = null) => {
+  inspect: (f, m = null) => {
     // main.that will assign functions to this insance
     const that = {}
 
@@ -38,12 +40,11 @@ module.exports = {
       .then(() => {
         that.read = (path) => fs.readFileSync(path)
 
-        const val = that.inspect(filepath, module);
-        if (val.startsWith("ERR:")) {
-          reject(val);
-        } else {
+        const p = m == null ? that.inspect(f) : that.inspect(f, m);
+        p.then(val => {
           resolve(JSON.parse(val));
-        }
+        })
+          .catch(reject)
       })
       .catch(reject)
       .finally(() => that.finish());

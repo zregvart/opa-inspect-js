@@ -15,7 +15,7 @@ test('inspects rego files second time', async () => {
 });
 
 test('reports error when parsing', async () => {
-    await expect(opa.inspect('example.rego', "bogus")).rejects.toEqual("ERR: 1 error occurred: example.rego:1: rego_parse_error: package expected");
+    await expect(opa.inspect('example.rego', "bogus")).rejects.toEqual("1 error occurred: example.rego:1: rego_parse_error: package expected");
 });
 
 test('inspects rego files read from the filesystem', async () => {

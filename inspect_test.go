@@ -1,10 +1,12 @@
 package main
 
 import (
+	"errors"
 	"syscall/js"
 	"testing"
 
 	"github.com/bradleyjkemp/cupaloy"
+	"github.com/stretchr/testify/assert"
 )
 
 var stubThat = js.ValueOf(map[string]any{})
@@ -25,13 +27,36 @@ deny[msg] {
 }
 `
 
+func outcome(p any) (string, error) {
+	promise := p.(js.Value)
+
+	ch := make(chan result)
+	go func() {
+		promise.Call("then", js.FuncOf(func(this js.Value, args []js.Value) any {
+			ch <- result{value: args[0].String()}
+
+			return nil
+		})).
+			Call("catch", js.FuncOf(func(this js.Value, args []js.Value) any {
+				ch <- result{err: errors.New(args[0].String())}
+
+				return nil
+			}))
+	}()
+
+	r := <-ch
+
+	return r.value, r.err
+}
+
 func TestInspectProvidedFile(t *testing.T) {
 	args := []js.Value{
 		js.ValueOf("example.rego"),
 		js.ValueOf(rego),
 	}
 
-	json := inspect(stubThat, args)
+	json, err := outcome(inspect(stubThat, args))
+	assert.NoError(t, err)
 
 	cupaloy.SnapshotT(t, json)
 }
@@ -41,7 +66,8 @@ func TestInspectSingleFileLoaded(t *testing.T) {
 		js.ValueOf("__test__/example.rego"),
 	}
 
-	json := inspect(stubThat, args)
+	json, err := outcome(inspect(stubThat, args))
+	assert.NoError(t, err)
 
 	cupaloy.SnapshotT(t, json)
 }
@@ -52,7 +78,8 @@ func TestInspectSingleFileLoadedSecondArgumentNull(t *testing.T) {
 		js.Null(),
 	}
 
-	json := inspect(stubThat, args)
+	json, err := outcome(inspect(stubThat, args))
+	assert.EqualError(t, err, "when given two arguments expecting both to be of string type")
 
 	cupaloy.SnapshotT(t, json)
 }
@@ -63,31 +90,8 @@ func TestInspectSingleFileLoadedSecondArgumentUndefined(t *testing.T) {
 		js.Undefined(),
 	}
 
-	json := inspect(stubThat, args)
-
-	cupaloy.SnapshotT(t, json)
-}
-
-func TestInspectSingleFileLoadedViaCustomReadFunction(t *testing.T) {
-	read := js.FuncOf(func(this js.Value, args []js.Value) any {
-		bytes := []byte(rego)
-		ary := js.Global().Get("Uint8Array").New(len(bytes))
-
-		js.CopyBytesToJS(ary, bytes)
-
-		return ary
-	})
-
-	that := js.ValueOf(map[string]any{
-		"read": read,
-	})
-	args := []js.Value{
-		js.ValueOf("__test__/example.rego"),
-	}
-
-	json := inspect(that, args)
-
-	print(json)
+	json, err := outcome(inspect(stubThat, args))
+	assert.EqualError(t, err, "when given two arguments expecting both to be of string type")
 
 	cupaloy.SnapshotT(t, json)
 }
@@ -98,7 +102,8 @@ func TestInspectSingleFileGivenAsArray(t *testing.T) {
 		ary,
 	}
 
-	json := inspect(stubThat, args)
+	json, err := outcome(inspect(stubThat, args))
+	assert.NoError(t, err)
 
 	cupaloy.SnapshotT(t, json)
 }
@@ -109,7 +114,8 @@ func TestInspectMultipleFilesGivenAsArray(t *testing.T) {
 		ary,
 	}
 
-	json := inspect(stubThat, args)
+	json, err := outcome(inspect(stubThat, args))
+	assert.NoError(t, err)
 
 	cupaloy.SnapshotT(t, json)
 }
