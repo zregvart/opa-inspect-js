@@ -33,7 +33,7 @@ opa.inspect(
 #   failure_msg: Task '%s' does not contain a bundle reference
 #
 deny[msg] {
-msg := "nope"
+    msg := "nope"
 }`).then(json => {
   console.log(json);
 });
