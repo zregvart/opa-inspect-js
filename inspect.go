@@ -68,10 +68,6 @@ func inspectSingle(path, module string) ([]*ast.AnnotationsRef, error) {
 	return result, nil
 }
 
-func tmp() ([]byte, error) {
-	return make([]byte, 0, 10), nil
-}
-
 func inspect(this js.Value, args []js.Value) any {
 	if len(args) == 1 {
 		if args[0].Type() == js.TypeString {
