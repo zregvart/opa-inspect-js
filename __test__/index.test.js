@@ -2,6 +2,14 @@ const fs = require('fs');
 const path = require('path');
 const opa = require('../index');
 
+beforeAll(() => {
+    require('events').EventEmitter.defaultMaxListeners = 10;
+})
+
+afterAll(() => {
+    expect(process.listeners('exit')).toHaveLength(0);
+})
+
 test('inspects rego files', async () => {
     const rego = fs.readFileSync(path.join(__dirname, 'example.rego')).toString();
     const json = await opa.inspect('example.rego', rego);
@@ -62,4 +70,9 @@ test('inspects vinyl streams', async () => {
             }
         }
     ]);
+});
+
+test.concurrent.each([...Array(25).keys()])('functions concurrently (%#)', async () => {
+    const rego = fs.readFileSync(path.join(__dirname, 'example.rego')).toString();
+    await expect(opa.inspect('example.rego', rego)).resolves.toHaveProperty('[0].annotations');
 });

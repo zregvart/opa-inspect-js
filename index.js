@@ -14,20 +14,21 @@ globalThis.fs = fs
 
 require('./wasm_exec');
 
+
 module.exports = {
   inspect: (f, m = null) => {
-    // main.that will assign functions to this insance
-    const that = {}
-
     const go = new Go();
-    // pass the reference so it's accessible in main.that
-    go.that = that
-    process.on('exit', code => {
+    const exitListener = code => {
       if (code === 0 && !go.exited) {
         go._pendingEvent = { id: 0 };
         go._resume();
       }
-    });
+    }
+    process.on('exit', exitListener);
+    // main.that will assign functions to this insance
+    const that = {}
+    // pass the reference so it's accessible in main.that
+    go.that = that
 
     return new Promise((resolve, reject) => {
       WebAssembly.instantiate(
@@ -47,7 +48,10 @@ module.exports = {
           .catch(reject)
       })
       .catch(reject)
-      .finally(() => that.finish());
+      .finally(() => {
+        that.finish()
+        process.removeListener('exit', exitListener)
+      });
     });
   }
 }
