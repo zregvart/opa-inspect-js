@@ -1,0 +1,27 @@
+---
+name: Checks
+
+"on":
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  Checks:
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup Go environment
+        uses: actions/setup-go@v3
+        with:
+          cache: true
+          go-version-file: go.mod
+
+      - name: Download go dependencies
+        run: go mod download
+
+      - name: Test
+        run: make test
