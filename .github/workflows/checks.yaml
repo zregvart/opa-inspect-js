@@ -20,6 +20,12 @@ jobs:
           cache: true
           go-version-file: go.mod
 
+      - name: Setup Node.js environment
+        uses: actions/setup-node@v3
+        with:
+          cache: 'npm'
+          node-version-file: 'package.json'
+
       - name: Download go dependencies
         run: go mod download
 
