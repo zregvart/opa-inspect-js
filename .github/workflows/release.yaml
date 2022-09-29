@@ -20,6 +20,12 @@ jobs:
           cache: true
           go-version-file: go.mod
 
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          cache: 'npm'
+          node-version-file: 'package.json'
+
       - name: Download go dependencies
         run: go mod download
 
@@ -29,10 +35,8 @@ jobs:
       - name: Test
         run: make test
 
-      - uses: actions/setup-node@v3
-        with:
-          node-version: 18
-      - run: |
+      - name: Release
+        run: |
           npm version --no-git-tag-version $(go list -m -f '{{.Version}}' github.com/open-policy-agent/opa)-$(git rev-parse --short HEAD)
           npm publish --access=public
         env:
