@@ -28,29 +28,27 @@ test('reports error when parsing', async () => {
 
 test('inspects rego files read from the filesystem', async () => {
     const json = await opa.inspect(path.join(__dirname, 'example.rego'));
-    expect(json).toMatchSnapshot([
-        {
-            "location": {
-                "file": expect.stringMatching(/.*__test__\/example\.rego/),
-            }
+    expect(json).toHaveLength(1);
+    expect(json[0]).toMatchSnapshot({
+        "location": {
+            "file": expect.stringMatching(/.*__test__\/example\.rego/),
         }
-    ]);
+    });
 });
 
 test('inspects multiple rego files', async () => {
     const json = await opa.inspect([path.join(__dirname, 'example.rego'), path.join(__dirname, 'example2.rego')]);
-    expect(json).toMatchSnapshot([
-        {
-            "location": {
-                "file": expect.stringMatching(/.*__test__\/example\.rego/),
-            }
-        },
-        {
-            "location": {
-                "file": expect.stringMatching(/.*__test__\/example2\.rego/),
-            }
+    expect(json).toHaveLength(2);
+    expect(json[0]).toMatchSnapshot({
+        "location": {
+            "file": expect.stringMatching(/.*__test__\/example\.rego/),
         }
-    ]);
+    });
+    expect(json[1]).toMatchSnapshot({
+        "location": {
+            "file": expect.stringMatching(/.*__test__\/example2\.rego/),
+        }
+    });
 });
 
 test('inspects vinyl streams', async () => {
@@ -58,18 +56,17 @@ test('inspects vinyl streams', async () => {
 
     const json = await opa.inspect(vfs.src(path.join(__dirname, '*.rego')));
 
-    expect(json).toMatchSnapshot([
-        {
-            "location": {
-                "file": expect.stringMatching(/.*__test__\/example\.rego/),
-            }
-        },
-        {
-            "location": {
-                "file": expect.stringMatching(/.*__test__\/example2\.rego/),
-            }
+    expect(json).toHaveLength(2);
+    expect(json[0]).toMatchSnapshot({
+        "location": {
+            "file": expect.stringMatching(/.*__test__\/example\.rego/),
         }
-    ]);
+    });
+    expect(json[1]).toMatchSnapshot({
+        "location": {
+            "file": expect.stringMatching(/.*__test__\/example2\.rego/),
+        }
+    });
 });
 
 test.concurrent.each([...Array(25).keys()])('functions concurrently (%#)', async () => {
