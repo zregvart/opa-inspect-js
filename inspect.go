@@ -96,6 +96,57 @@ func serialize(results []*ast.AnnotationsRef) (string, error) {
 	return buffy.String(), nil
 }
 
+func inspectStringArray(pathAry js.Value, ch chan result) {
+	len := pathAry.Length()
+	paths := make([]string, 0, len)
+	modules := make([]string, 0, len)
+
+	for i := 0; i < len; i++ {
+		path := pathAry.Index(i).String()
+		paths = append(paths, path)
+
+		moduleBytes, err := os.ReadFile(path)
+		if err != nil {
+			ch <- result{err: err}
+		}
+
+		module := string(moduleBytes)
+		modules = append(modules, module)
+	}
+
+	if results, err := inspectMultiple(paths, modules); err != nil {
+		ch <- result{err: err}
+	} else if json, err := serialize(results); err != nil {
+		ch <- result{err: err}
+	} else {
+		ch <- result{value: json}
+	}
+}
+
+func inspectVynlArray(vynlAry js.Value, ch chan result) {
+	len := vynlAry.Length()
+
+	asts := make([]*ast.AnnotationsRef, 0, len)
+	for i := 0; i < len; i++ {
+		el := vynlAry.Index(i)
+		path := el.Get("path").String()
+		module := el.Get("contents").Call("toString").String()
+
+		ast, err := inspectSingle(path, module)
+		if err != nil {
+			ch <- result{err: err}
+		}
+
+		asts = append(asts, ast...)
+	}
+
+	if json, err := serialize(asts); err != nil {
+		ch <- result{err: err}
+	} else {
+		ch <- result{value: json}
+	}
+}
+
 func inspect(this js.Value, args []js.Value) any {
 	if len(args) == 1 {
 		if args[0].Type() == js.TypeString {
@@ -126,36 +177,19 @@ func inspect(this js.Value, args []js.Value) any {
 
 			return resolveWith(ch)
 		} else if args[0].InstanceOf(js.Global().Get("Array")) {
-			pathAry := args[0]
-			len := pathAry.Length()
+			ary := args[0]
+			len := ary.Length()
 
 			ch := make(chan result)
+			if len == 0 {
+				return resolveWith(ch)
+			}
 
-			go func() {
-				paths := make([]string, 0, len)
-				modules := make([]string, 0, len)
-
-				for i := 0; i < len; i++ {
-					path := pathAry.Index(i).String()
-					paths = append(paths, path)
-
-					moduleBytes, err := os.ReadFile(path)
-					if err != nil {
-						ch <- result{err: err}
-					}
-
-					module := string(moduleBytes)
-					modules = append(modules, module)
-				}
-
-				if results, err := inspectMultiple(paths, modules); err != nil {
-					ch <- result{err: err}
-				} else if json, err := serialize(results); err != nil {
-					ch <- result{err: err}
-				} else {
-					ch <- result{value: json}
-				}
-			}()
+			if ary.Index(0).Type() == js.TypeString {
+				go inspectStringArray(ary, ch)
+			} else {
+				go inspectVynlArray(ary, ch)
+			}
 
 			return resolveWith(ch)
 		} else if pipe := args[0].Get("pipe"); pipe.Type() == js.TypeFunction {

@@ -47,7 +47,9 @@ Can be called with following combination of arguments:
   * `<string>` - a path that can be read using the `fs` module
   * `<string>`, `<string>` - a path/filename and the content of the Rego module inline, performs in-memory
   * `<Array<string>>` - an array of paths that can be read using the `fs` module
-  * `<stream<File>>` - a [Vinyl](https://github.com/gulpjs/vinyl) stream of files
+  * `<stream<File>>` - a [Vinyl](https://github.com/gulpjs/vinyl) stream of
+    files
+  * `<Array<File>> - an array of [Vinyl](https://github.com/gulpjs/vinyl) files
 
 ## Building
 

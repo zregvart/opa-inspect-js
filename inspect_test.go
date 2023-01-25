@@ -149,3 +149,21 @@ func TestInspectVinylStream(t *testing.T) {
 
 	cupaloy.SnapshotT(t, json)
 }
+
+func TestInspectArrayOfVinyl(t *testing.T) {
+	example := js.ValueOf(map[string]any{
+		"path":     js.ValueOf("__test__/example.rego"),
+		"contents": js.Global().Get("Buffer").Call("from", rego),
+	})
+
+	ary := js.Global().Get("Array").New(example)
+
+	args := []js.Value{
+		ary,
+	}
+
+	json, err := outcome(inspect(stubThat, args))
+	assert.NoError(t, err)
+
+	cupaloy.SnapshotT(t, json)
+}

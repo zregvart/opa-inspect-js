@@ -69,6 +69,38 @@ test('inspects vinyl streams', async () => {
     });
 });
 
+test('multiple vinyl files', async () => {
+    const Vinyl = require('vinyl');
+
+    const example = new Vinyl({
+       cwd: '/',
+       base: __dirname,
+       path: `/${__dirname}/example.rego`,
+       contents: fs.readFileSync(path.join(__dirname, 'example.rego'))
+    });
+
+    const example2 = new Vinyl({
+       cwd: '/',
+       base: __dirname,
+       path: `/${__dirname}/example2.rego`,
+       contents: fs.readFileSync(path.join(__dirname, 'example2.rego'))
+    });
+
+    const json = await opa.inspect([example, example2]);
+
+    expect(json).toHaveLength(2);
+    expect(json[0]).toMatchSnapshot({
+        "location": {
+            "file": expect.stringMatching(/.*__test__\/example\.rego/),
+        }
+    });
+    expect(json[1]).toMatchSnapshot({
+        "location": {
+            "file": expect.stringMatching(/.*__test__\/example2\.rego/),
+        }
+    });
+});
+
 test.concurrent.each([...Array(25).keys()])('functions concurrently (%#)', async () => {
     const rego = fs.readFileSync(path.join(__dirname, 'example.rego')).toString();
     await expect(opa.inspect('example.rego', rego)).resolves.toHaveProperty('[0].annotations');
