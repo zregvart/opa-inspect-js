@@ -1,0 +1,37 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`browser inspects rego 1`] = `
+[
+  {
+    "annotations": {
+      "custom": {
+        "failure_msg": "Task '%s' does not contain a bundle reference",
+        "short_name": "disallowed_task_reference",
+      },
+      "description": "Check for existence of a task bundle. Enforcing this rule will
+fail the contract if the task is not called from a bundle.",
+      "scope": "rule",
+      "title": "Task bundle was not used or is not defined",
+    },
+    "location": {
+      "col": 1,
+      "file": "example.rego",
+      "row": 12,
+    },
+    "path": [
+      {
+        "type": "var",
+        "value": "data",
+      },
+      {
+        "type": "string",
+        "value": "example",
+      },
+      {
+        "type": "string",
+        "value": "deny",
+      },
+    ],
+  },
+]
+`;
