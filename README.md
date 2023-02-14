@@ -17,7 +17,7 @@ npm add @zregvart/opa-inspect
 Run this example with `node example.js`
 
 ```javascript
-const opa = require("@zregvart/opa-inspect");
+import * as opa from "@zregvart/opa-inspect";
 
 opa.inspect(
     "example.rego",

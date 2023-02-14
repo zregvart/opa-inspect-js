@@ -1,4 +1,4 @@
-const opa = require("./index");
+import * as opa from './main.js'
 
 opa.inspect(
     "example.rego",
