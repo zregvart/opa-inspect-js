@@ -5,7 +5,8 @@
   "engines": {
     "node": ">=18.0.0"
   },
-  "main": "index.js",
+  "main": "main.js",
+  "type": "module",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/zregvart/opa-inspect-js.git"
@@ -21,7 +22,7 @@
   },
   "homepage": "https://github.com/zregvart/opa-inspect-js#readme",
   "scripts": {
-    "test": "jest"
+    "test": "node --experimental-vm-modules ./node_modules/.bin/jest"
   },
   "files": [
     "*.js",

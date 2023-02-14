@@ -1,4 +1,4 @@
-build: .env index.js inspect.wasm wasm_exec.js
+build: .env main.js inspect.wasm wasm_exec.js
 
 .PHONY: test-go
 test-go:
@@ -28,8 +28,8 @@ wasm_exec.js: $(shell go env GOROOT)/misc/wasm/wasm_exec.js wasm_exec.js.patch
 	@cp -f "$$(go env GOROOT)/misc/wasm/wasm_exec.js" .
 	@patch < wasm_exec.js.patch
 
-index.js: package.json node_modules
-	@touch index.js
+main.js: package.json node_modules
+	@touch main.js
 
 .env: .env.template
 	@while read line; do eval "echo $${line}"; done < .env.template > .env
