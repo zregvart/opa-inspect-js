@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>OPA inspect browser example</title>
+  <link href="style.css" rel="stylesheet">
+</head>
+
+<body>
+  <main class="container">
+    <h1>&#128300; Inspect Rego (<code>opa inspect</code> in browser)</h1>
+    <div class="grid">
+      <div>
+        <label for="content">Rego code</label>
+        <textarea id="content" rows="20">package example
+
+# METADATA
+# title: Example Rule
+# description: |-
+#   Just a simple example rule
+# custom:
+#   wather: sunny
+#   color: blue
+#
+deny[msg] {
+    msg := "Never gonna give you up"
+}</textarea>
+      </div>
+      <div>
+        <label for="output">Inspected</label>
+        <pre id="output" class="language-javascript"></pre>
+      </div>
+    </div>
+
+  </main>
+  <script type="module" src="/main.js"></script>
+</body>
+
+</html>

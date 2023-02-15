@@ -1,5 +1,7 @@
 import * as go from './wasm_exec.js';
 
+let inspectWASMURL = './inspect.wasm'
+
 const inspect = (f, m) => {
     const goruntime = new Go();
     // main.that will assign functions to this insance
@@ -9,7 +11,7 @@ const inspect = (f, m) => {
 
     return new Promise((res, rej) => {
         WebAssembly.instantiateStreaming(
-            fetch('./inspect.wasm'),
+            fetch(inspectWASMURL),
             goruntime.importObject
         )
         .then(result => {
@@ -29,4 +31,6 @@ const inspect = (f, m) => {
     });
 }
 
-export { inspect }
+const inspectWASM = (url) => inspectWASMURL = url
+
+export { inspect, inspectWASM }

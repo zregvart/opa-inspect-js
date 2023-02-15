@@ -39,6 +39,25 @@ deny[msg] {
 });
 ```
 
+## Running examples
+
+### In browser example
+
+Run the `dev` script with the `examples/browser` workspace, for example:
+
+```shell
+$ npm run -w examples/browser dev
+
+  VITE v4.1.1  ready in 166 ms
+
+  ➜  Local:   http://localhost:5173/
+  ➜  Network: use --host to expose
+  ➜  press h to show help
+
+```
+
+And open http://localhost:5173/ in the browser.
+
 ## API
 
 **`opa.inspect`**

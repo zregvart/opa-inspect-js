@@ -1,6 +1,6 @@
 {
   "name": "@zregvart/opa-inspect",
-  "version": "0.43.0-75b0ea9",
+  "version": "0.0.0",
   "description": "opa inspect functionality in JavaScript",
   "engines": {
     "node": ">=18.0.0"
@@ -40,5 +40,9 @@
   },
   "overrides": {
     "glob-parent": "6.0.2"
-  }
+  },
+  "workspaces": [
+    ".",
+    "examples/*"
+  ]
 }

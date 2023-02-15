@@ -1,0 +1,15 @@
+@import url('@picocss/pico');
+@import url('prismjs/themes/prism-solarizedlight.css');
+
+textarea:invalid {
+    background-color: #fff0f0;
+    transition: background-color 1s;
+}
+
+#output {
+    background-color: white;
+}
+
+label {
+    font-weight: bold;
+}
