@@ -29,6 +29,4 @@ const inspect = (f, m) => {
     });
 }
 
-const inspectx = () => 'hello'
-
 export { inspect }
