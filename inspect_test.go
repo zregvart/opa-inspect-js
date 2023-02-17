@@ -11,7 +11,10 @@ import (
 
 var stubThat = js.ValueOf(map[string]any{})
 
-var rego = `package example
+var rego = `# METADATA
+# title: title
+# description: description
+package example
 
 # METADATA
 # title: Task bundle was not used or is not defined

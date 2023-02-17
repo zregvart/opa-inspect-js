@@ -60,12 +60,7 @@ func inspectSingle(path, module string) ([]*ast.AnnotationsRef, error) {
 		return nil, err
 	}
 
-	results := make([]*ast.AnnotationsRef, 0, len(mod.Rules))
-	for _, rule := range mod.Rules {
-		results = append(results, as.Chain(rule)...)
-	}
-
-	return results, nil
+	return as.Flatten(), nil
 }
 
 func inspectMultiple(paths, modules []string) ([]*ast.AnnotationsRef, error) {

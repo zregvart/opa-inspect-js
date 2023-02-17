@@ -303,3 +303,30 @@ exports[`nodejs multiple vinyl files 2`] = `
   ],
 }
 `;
+
+exports[`nodejs package metadata 1`] = `
+[
+  {
+    "annotations": {
+      "description": "description",
+      "scope": "package",
+      "title": "title",
+    },
+    "location": {
+      "col": 1,
+      "file": "example.rego",
+      "row": 5,
+    },
+    "path": [
+      {
+        "type": "var",
+        "value": "data",
+      },
+      {
+        "type": "string",
+        "value": "example",
+      },
+    ],
+  },
+]
+`;

@@ -108,4 +108,13 @@ describe("nodejs", () => {
         const rego = fs.readFileSync(new url.URL('./example.rego', import.meta.url)).toString();
         await expect(opa.inspect('example.rego', rego)).resolves.toHaveProperty('[0].annotations');
     });
+
+    test('package metadata', async () => {
+        const json = await opa.inspect('example.rego', `#
+# METADATA
+# title: title
+# description: description
+package example`);
+        expect(json).toMatchSnapshot();
+    })
 });
