@@ -4,3 +4,4 @@ wasm_exec.js
 node_modules
 .env
 yarn-error.log
+examples/browser/dist/
