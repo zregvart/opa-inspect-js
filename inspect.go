@@ -50,7 +50,17 @@ func resolveWith(r chan result) js.Value {
 }
 
 func inspectSingle(path, module string) ([]*ast.AnnotationsRef, error) {
-	mod, err := ast.ParseModuleWithOpts(path, module, ast.ParserOptions{ProcessAnnotation: true})
+	options := ast.ParserOptions{
+		ProcessAnnotation: true,
+		JSONOptions: &ast.JSONOptions{
+			MarshalOptions: ast.JSONMarshalOptions{
+				IncludeLocation: ast.NodeToggle{
+					AnnotationsRef: true,
+				},
+			},
+		},
+	}
+	mod, err := ast.ParseModuleWithOpts(path, module, options)
 	if err != nil {
 		return nil, err
 	}
