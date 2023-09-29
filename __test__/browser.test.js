@@ -28,11 +28,18 @@ describe("browser", () => {
     let browser, server;
 
     beforeAll(async () => {
+        let isListening
+        const listening = new Promise((resolve) => isListening = resolve)
         server = http.createServer((req, res) => {
-            if (req.url === '/') {
-                res.writeHead(200, { 'Content-Type': 'text/html' })
-                res.end(testHTML, 'utf-8')
-                return
+            switch (req.url) {
+                case '/':
+                    res.writeHead(200, { 'Content-Type': 'text/html' })
+                    res.end(testHTML, 'utf-8')
+                    return
+                case '/favicon.ico':
+                    res.writeHead(200, { 'Content-Type': 'image/vnd.microsoft.icon', 'Content-Length': 0 })
+                    res.end()
+                    return
             }
 
             let file = path.join(path.dirname(url.fileURLToPath(import.meta.url)), '..' , req.url);
@@ -44,8 +51,8 @@ describe("browser", () => {
 
             fs.readFile(file, function (err, content) {
                 if (err && err.code == 'ENOENT') {
-                    console.log(`Not found ${file}: ${err}`);
-                    res.writeHead(200, { 'Content-Type': contentType });
+                    console.warn(`Not found ${file}: ${err}`);
+                    res.writeHead(404, { 'Content-Type': 'text/plain' });
                     res.end();
                 } else {
                     res.writeHead(200, { 'Content-Type': contentType });
@@ -53,13 +60,15 @@ describe("browser", () => {
                 }
             });
 
-        }).listen(8125);
+        }).listen(8125, isListening);
 
-        browser = await puppeteer.launch();
+        await listening
+
+        browser = await puppeteer.launch({headless: "new"});
     })
 
     afterAll(async () => {
-        await server.close();
+        await server.unref().close();
         await browser.close();
     })
 
