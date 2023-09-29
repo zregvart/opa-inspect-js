@@ -14,6 +14,7 @@ import (
 	"unsafe"
 
 	"github.com/open-policy-agent/opa/ast"
+	astJSON "github.com/open-policy-agent/opa/ast/json"
 )
 
 var wait sync.WaitGroup
@@ -52,9 +53,9 @@ func resolveWith(r chan result) js.Value {
 func inspectSingle(path, module string) ([]*ast.AnnotationsRef, error) {
 	options := ast.ParserOptions{
 		ProcessAnnotation: true,
-		JSONOptions: &ast.JSONOptions{
-			MarshalOptions: ast.JSONMarshalOptions{
-				IncludeLocation: ast.NodeToggle{
+		JSONOptions: &astJSON.Options{
+			MarshalOptions: astJSON.MarshalOptions{
+				IncludeLocation: astJSON.NodeToggle{
 					AnnotationsRef: true,
 				},
 			},
