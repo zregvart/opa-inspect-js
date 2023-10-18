@@ -4,7 +4,7 @@ go 1.20
 
 require (
 	github.com/bradleyjkemp/cupaloy v2.3.0+incompatible
-	github.com/open-policy-agent/opa v0.57.0
+	github.com/open-policy-agent/opa v0.57.1
 	github.com/stretchr/testify v1.8.4
 )
 
