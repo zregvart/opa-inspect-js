@@ -19,6 +19,7 @@ import (
 
 var wait sync.WaitGroup
 
+//go:wasmimport gojs main.that
 func that(uint64)
 
 type result struct {

@@ -33,6 +33,9 @@ const inspect = (f, m = null) => {
       })
       .catch(rej)
     })
+    .catch((reason) => {
+      console.log(reason)
+    })
     .catch(rej)
     .finally(() => {
       that.finish && that.finish()
