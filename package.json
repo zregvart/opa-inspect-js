@@ -23,7 +23,7 @@
   },
   "homepage": "https://github.com/zregvart/opa-inspect-js#readme",
   "scripts": {
-    "test": "node --experimental-vm-modules ./node_modules/.bin/jest"
+    "test": "node --experimental-vm-modules ./node_modules/.bin/jest --detectOpenHandles"
   },
   "files": [
     "*.js",

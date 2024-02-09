@@ -39,6 +39,12 @@ const inspect = (f, m = null) => {
     .catch(rej)
     .finally(() => {
       that.finish && that.finish()
+      // runtime.scheduleTimeoutEvent scheduled timeouts that didn't get
+      // runtime.clearTimeoutEvent'ed before we exit, we clear them manually
+      // here so they do not trigger with the runtime already exited
+      for (const fn of goruntime._scheduledTimeouts.values()) {
+        clearTimeout(fn)
+      }
       process.removeListener('exit', exitListener)
     });
   });
