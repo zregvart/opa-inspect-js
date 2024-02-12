@@ -13,7 +13,7 @@
     "vite": "^5.0.2"
   },
   "dependencies": {
-    "@picocss/pico": "^1.5.7",
+    "@picocss/pico": "^2.0.0",
     "@zregvart/opa-inspect": "^0.0.0",
     "prismjs": "^1.29.0"
   }
