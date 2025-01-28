@@ -1,10 +1,10 @@
 module github.com/zregvart/opa-inspect-js
 
-go 1.21.2
+go 1.23
 
 require (
 	github.com/bradleyjkemp/cupaloy v2.3.0+incompatible
-	github.com/open-policy-agent/opa v0.70.0
+	github.com/open-policy-agent/opa v1.1.0
 	github.com/stretchr/testify v1.10.0
 )
 

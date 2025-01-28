@@ -20,7 +20,7 @@ const exampleRego = `package example
 #   short_name: disallowed_task_reference
 #   failure_msg: Task '%s' does not contain a bundle reference
 #
-deny[msg] {
+deny contains msg if {
     msg := "nope"
 }`
 
