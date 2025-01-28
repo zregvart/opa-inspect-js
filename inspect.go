@@ -13,8 +13,8 @@ import (
 	"syscall/js"
 	"unsafe"
 
-	"github.com/open-policy-agent/opa/ast"
-	astJSON "github.com/open-policy-agent/opa/ast/json"
+	"github.com/open-policy-agent/opa/v1/ast"
+	astJSON "github.com/open-policy-agent/opa/v1/ast/json"
 )
 
 var wait sync.WaitGroup
@@ -52,15 +52,15 @@ func resolveWith(r chan result) js.Value {
 }
 
 func inspectSingle(path, module string) ([]*ast.AnnotationsRef, error) {
-	options := ast.ParserOptions{
-		ProcessAnnotation: true,
-		JSONOptions: &astJSON.Options{
-			MarshalOptions: astJSON.MarshalOptions{
-				IncludeLocation: astJSON.NodeToggle{
-					AnnotationsRef: true,
-				},
+	astJSON.SetOptions(astJSON.Options{
+		MarshalOptions: astJSON.MarshalOptions{
+			IncludeLocation: astJSON.NodeToggle{
+				AnnotationsRef: true,
 			},
 		},
+	})
+	options := ast.ParserOptions{
+		ProcessAnnotation: true,
 	}
 	mod, err := ast.ParseModuleWithOpts(path, module, options)
 	if err != nil {

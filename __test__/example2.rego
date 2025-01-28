@@ -5,6 +5,6 @@ package example2
 # description: Second example
 # custom:
 #   short_name: example2
-deny[msg] {
+deny contains msg if {
     msg := "nope"
 }
