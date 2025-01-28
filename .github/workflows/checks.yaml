@@ -29,5 +29,8 @@ jobs:
       - name: Download go dependencies
         run: go mod download
 
+      - name: Allow unprivileged userns
+        run: echo 0 | sudo tee /proc/sys/kernel/apparmor_restrict_unprivileged_userns
+
       - name: Test
         run: make test
