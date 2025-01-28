@@ -1,7 +1,6 @@
 module github.com/zregvart/opa-inspect-js
 
-go 1.21.2
-toolchain go1.22.11
+go 1.23
 
 require (
 	github.com/bradleyjkemp/cupaloy v2.3.0+incompatible
