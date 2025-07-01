@@ -4,7 +4,7 @@ go 1.23.8
 
 require (
 	github.com/bradleyjkemp/cupaloy v2.3.0+incompatible
-	github.com/open-policy-agent/opa v1.5.1
+	github.com/open-policy-agent/opa v1.6.0
 	github.com/stretchr/testify v1.10.0
 )
 
