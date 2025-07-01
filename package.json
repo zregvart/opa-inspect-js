@@ -33,7 +33,7 @@
     "!*.test.js"
   ],
   "devDependencies": {
-    "jest": "^29.0.2",
+    "jest": "^30.0.3",
     "map-stream": "^0.0.7",
     "puppeteer": "^24.1.1",
     "vinyl-fs": "^4.0.0"
