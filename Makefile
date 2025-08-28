@@ -2,7 +2,7 @@ build: .env main.js inspect.wasm wasm_exec.js
 
 .PHONY: test-go
 test-go:
-	@PATH="$$PATH:$$(go env GOROOT)/misc/wasm" GOOS=js GOARCH=wasm go test ./... -timeout 1s
+	@PATH="$$PATH:$$(go env GOROOT)/lib/wasm" GOOS=js GOARCH=wasm go test ./... -timeout 1s
 
 .PHONY: test-js
 test-js: build node_modules
@@ -24,8 +24,8 @@ demo: build
 inspect.wasm: inspect.go
 	@GOOS=js GOARCH=wasm go build -o inspect.wasm
 
-wasm_exec.js: $(shell go env GOROOT)/misc/wasm/wasm_exec.js wasm_exec.js.patch
-	@cp -f "$$(go env GOROOT)/misc/wasm/wasm_exec.js" .
+wasm_exec.js: $(shell go env GOROOT)/lib/wasm/wasm_exec.js wasm_exec.js.patch
+	@cp -f "$$(go env GOROOT)/lib/wasm/wasm_exec.js" .
 	@patch < wasm_exec.js.patch
 
 main.js: package.json node_modules
