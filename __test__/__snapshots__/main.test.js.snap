@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
 
-exports[`nodejs functions concurrently (7) 1`] = `
+exports[`nodejs functions concurrently (9) 1`] = `
 [
   {
     "annotations": {
@@ -36,7 +36,7 @@ fail the contract if the task is not called from a bundle.",
 ]
 `;
 
-exports[`nodejs functions concurrently (12) 1`] = `
+exports[`nodejs functions concurrently (14) 1`] = `
 [
   {
     "annotations": {
