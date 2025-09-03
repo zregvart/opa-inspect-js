@@ -1,4 +1,110 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`nodejs functions concurrently (9) 1`] = `
+[
+  {
+    "annotations": {
+      "custom": {
+        "failure_msg": "Task '%s' does not contain a bundle reference",
+        "short_name": "disallowed_task_reference",
+      },
+      "description": "Check for existence of a task bundle. Enforcing this rule will
+fail the contract if the task is not called from a bundle.",
+      "scope": "rule",
+      "title": "Task bundle was not used or is not defined",
+    },
+    "location": {
+      "col": 1,
+      "file": "example.rego",
+      "row": 12,
+    },
+    "path": [
+      {
+        "type": "var",
+        "value": "data",
+      },
+      {
+        "type": "string",
+        "value": "example",
+      },
+      {
+        "type": "string",
+        "value": "deny",
+      },
+    ],
+  },
+]
+`;
+
+exports[`nodejs functions concurrently (14) 1`] = `
+[
+  {
+    "annotations": {
+      "custom": {
+        "failure_msg": "Task '%s' does not contain a bundle reference",
+        "short_name": "disallowed_task_reference",
+      },
+      "description": "Check for existence of a task bundle. Enforcing this rule will
+fail the contract if the task is not called from a bundle.",
+      "scope": "rule",
+      "title": "Task bundle was not used or is not defined",
+    },
+    "location": {
+      "col": 1,
+      "file": "example.rego",
+      "row": 12,
+    },
+    "path": [
+      {
+        "type": "var",
+        "value": "data",
+      },
+      {
+        "type": "string",
+        "value": "example",
+      },
+      {
+        "type": "string",
+        "value": "deny",
+      },
+    ],
+  },
+]
+`;
+
+exports[`nodejs functions concurrently (24) 1`] = `
+{
+  "annotations": {
+    "custom": {
+      "failure_msg": "Task '%s' does not contain a bundle reference",
+      "short_name": "disallowed_task_reference",
+    },
+    "description": "Check for existence of a task bundle. Enforcing this rule will
+fail the contract if the task is not called from a bundle.",
+    "scope": "rule",
+    "title": "Task bundle was not used or is not defined",
+  },
+  "location": {
+    "col": 1,
+    "file": StringMatching /\\\\/example\\\\\\.rego\\$/,
+    "row": 12,
+  },
+  "path": [
+    {
+      "type": "var",
+      "value": "data",
+    },
+    {
+      "type": "string",
+      "value": "example",
+    },
+    {
+      "type": "string",
+      "value": "deny",
+    },
+  ],
+}
+`;
 
 exports[`nodejs inspects multiple rego files 1`] = `
 {
@@ -64,112 +170,6 @@ exports[`nodejs inspects multiple rego files 2`] = `
     },
   ],
 }
-`;
-
-exports[`nodejs inspects rego files 1`] = `
-[
-  {
-    "annotations": {
-      "custom": {
-        "failure_msg": "Task '%s' does not contain a bundle reference",
-        "short_name": "disallowed_task_reference",
-      },
-      "description": "Check for existence of a task bundle. Enforcing this rule will
-fail the contract if the task is not called from a bundle.",
-      "scope": "rule",
-      "title": "Task bundle was not used or is not defined",
-    },
-    "location": {
-      "col": 1,
-      "file": "example.rego",
-      "row": 12,
-    },
-    "path": [
-      {
-        "type": "var",
-        "value": "data",
-      },
-      {
-        "type": "string",
-        "value": "example",
-      },
-      {
-        "type": "string",
-        "value": "deny",
-      },
-    ],
-  },
-]
-`;
-
-exports[`nodejs inspects rego files read from the filesystem 1`] = `
-{
-  "annotations": {
-    "custom": {
-      "failure_msg": "Task '%s' does not contain a bundle reference",
-      "short_name": "disallowed_task_reference",
-    },
-    "description": "Check for existence of a task bundle. Enforcing this rule will
-fail the contract if the task is not called from a bundle.",
-    "scope": "rule",
-    "title": "Task bundle was not used or is not defined",
-  },
-  "location": {
-    "col": 1,
-    "file": StringMatching /\\\\/example\\\\\\.rego\\$/,
-    "row": 12,
-  },
-  "path": [
-    {
-      "type": "var",
-      "value": "data",
-    },
-    {
-      "type": "string",
-      "value": "example",
-    },
-    {
-      "type": "string",
-      "value": "deny",
-    },
-  ],
-}
-`;
-
-exports[`nodejs inspects rego files second time 1`] = `
-[
-  {
-    "annotations": {
-      "custom": {
-        "failure_msg": "Task '%s' does not contain a bundle reference",
-        "short_name": "disallowed_task_reference",
-      },
-      "description": "Check for existence of a task bundle. Enforcing this rule will
-fail the contract if the task is not called from a bundle.",
-      "scope": "rule",
-      "title": "Task bundle was not used or is not defined",
-    },
-    "location": {
-      "col": 1,
-      "file": "example.rego",
-      "row": 12,
-    },
-    "path": [
-      {
-        "type": "var",
-        "value": "data",
-      },
-      {
-        "type": "string",
-        "value": "example",
-      },
-      {
-        "type": "string",
-        "value": "deny",
-      },
-    ],
-  },
-]
 `;
 
 exports[`nodejs inspects vinyl streams 1`] = `
